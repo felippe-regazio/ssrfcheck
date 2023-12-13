@@ -1,0 +1,19 @@
+{
+  "name": "ssrfcheck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/index.js"
+  },
+  "bin": {
+    "ssrfcheck": "./src/cli.js"
+  },  
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "is-loopback-addr": "^2.0.2",
+    "private-ip": "^3.0.1"
+  }
+}
