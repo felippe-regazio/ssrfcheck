@@ -67,6 +67,7 @@ Options must be an object with the following structure:
 You can pass incremental options, that means: if you dont pass a value for some options, the library will provide default values.
 
 Option|Description|Type|Default|
+|--|--|--|
 quiet|When an error occurs the function will only return false and wont throw it|boolean|true|
 noIP|Tells if the validator must automatically block any IP-URIs, e.g. https://164.456.34.44. By default IP URIs are allowed but analysed to check if there is any SSRF risk|boolean|false|
 allowUsername|Tells if the validator must allow URI's that contains login notation, e.g. https://test:pass@domain.com. Address like this are blocked by default|boolean|false|
@@ -92,6 +93,7 @@ const result = isSSRFSafeURL(url, {
 You can pass any options using CLI notation
 
 Option|Equivalent
+|--|--|
 --quiet|quiet
 --no-ip|noIP
 --allow-username|allowUsername
