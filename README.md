@@ -105,7 +105,7 @@ Example
 npx ssrfcheck ftp://user:pass@localhost:8080/whatever --allowed-protocols=ftp,http,https --allow-username
 ```
 
-# What does this Lib?
+# What does this Lib check?
 
 The library checks for complete URLs focusing on the protocol and domain structure and tells whether is a possible SSRF attack or not. This library does NOT checks for path traversal attacks. The checks are made in the following order:
 
