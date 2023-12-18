@@ -41,10 +41,11 @@ const shouldPassErrors = shouldPassData.filter(url => {
 
 // =================================================================
 
+console.log('-'.repeat(process.stdout.columns / 2));
 const errorsCount = shouldNotPassErrors.length + shouldPassErrors.length;
 
 if (errorsCount) {
   throw new Error(`❌ TEST ERRORS: ${errorsCount}`);
 }
 
-console.log('\n✅ All ok!');
+console.log('✅ All ok!');
