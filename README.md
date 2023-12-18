@@ -1,14 +1,14 @@
 # SSRF Check
 
-Check if a given URI-String contains a possible SSRF attack.
+Check if a given URI-String contains a possible SSRF (Server-Side Request Forgery) attack. Zero dependencies!
 
-### Installation
+## Installation
 
 ```
 npm install ssrfcheck
 ```
 
-### Usage
+## Usage
 
 ```js
 import { isSSRFSafeURL } from 'ssrfcheck';
@@ -18,6 +18,32 @@ const result = isSSRFSafeURL(url); // false
 ```
 
 The function returns true for a safe URL, and false for an unsafe one.
+
+### CLI
+
+```
+npx ssrfcheck <uri> <options>
+```
+
+Or if you prefer, just intall the lib globaly and supress the npx:
+
+```
+npm install -g ssrfcheck
+```
+
+Usage Example:
+
+```
+npx ssrfcheck https://localhost:8080/whatever
+```
+
+The command above will output `Safe` for safe URLs and `Danger!` for the possibly vulnerable ones.
+
+## When to Use
+
+If you have any user-input/config that receives an URL, you are vunerable to SSRF attacks and must validate your URL. This library must be used on the backend. You can know more about it here:
+
+https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Request%20Forgery/README.md
 
 ## Options
 
@@ -61,23 +87,7 @@ const result = isSSRFSafeURL(url, {
 });
 ```
 
-## CLI
-
-You can use the CLI interface to check if a string contains a possible SSRF attack. The CLI will return `Safe` for safe URIs and `Danger!` for possible vulnerable URIs:
-
-```
-npx ssrfcheck <uri> <options>
-```
-
-Example
-
-```
-npx ssrfcheck https://localhost:8080/whatever
-```
-
-The command above will output `Danger!`
-
-### Options
+### CLI Options
 
 You can pass any options using CLI notation
 
@@ -93,6 +103,23 @@ Example
 npx ssrfcheck ftp://user:pass@localhost:8080/whatever --allowed-protocols=ftp,http,https --allow-username
 ```
 
-### CLI Help
+# What this lib check
 
-To get help, just call `npx ssrfcheck` with no parameters
+The library check complete URLs focusing on the protocol and domain structure. This library does NOT checks for path traversal attacks. The checks are made in the following order:
+
+- must contain a hostname
+- must not contain login-urls (e.g: https://user:pass@domain.com) - optionated
+- cannot be a dot domain (e.g: https://./../.com) - commonly result of some trick
+- cannot be localhost or loopback domain
+- cannot be a private IP of any range
+- checks for tricks: oct domain, decimal domains, special chars, etc
+
+If you wann know more about coverage, check the tests directory of this project. Test data lives in /tests/data folder.
+
+# Contribution
+
+Sources are in `/src`, tests in `/tests`. No build needed. To run tests: `npm run test`. No dependencies, no install, just code and test.
+
+# LICENSE
+
+MIT LICENSE Copyright (c) 2023 Felippe Regazio

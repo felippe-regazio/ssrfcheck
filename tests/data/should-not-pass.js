@@ -1,4 +1,4 @@
-export default [
+module.exports = [
   "http://127.0.0.1:80",
   "http://127.0.0.1:443",
   "http://127.0.0.1:22",
@@ -162,4 +162,4 @@ export default [
   "http://userid:password@example.com",
   "http://userid:password@example.com/",
   "http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com"
-]
+];

@@ -1,4 +1,4 @@
-export default [
+module.exports = [
   "http://foo.com/blah_blah",
   "http://foo.com/blah_blah/",
   "http://foo.com/blah_blah_(wikipedia)",
@@ -27,4 +27,4 @@ export default [
   "http://a.b-c.de",
   "http://223.255.255.254",
   "http://ⓔⓧⓐⓜⓟⓛⓔ.ⓒⓞⓜ"
-]
+];
