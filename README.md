@@ -67,7 +67,7 @@ Options must be an object with the following structure:
 You can pass incremental options, that means: if you dont pass a value for some options, the library will provide default values.
 
 |Option|Description|Type|Default|
-|--|--|--|
+|--|--|--|---|
 |quiet|When an error occurs the function will only return false and wont throw it|boolean|true|
 |noIP|Tells if the validator must automatically block any IP-URIs, e.g. https://164.456.34.44. By default IP URIs are allowed |but analysed to check if there is any SSRF risk|boolean|false|
 |allowUsername|Tells if the validator must allow URI's that contains login notation, e.g. https://test:pass@domain.com. Address |like this are blocked by default|boolean|false|
@@ -105,9 +105,9 @@ Example
 npx ssrfcheck ftp://user:pass@localhost:8080/whatever --allowed-protocols=ftp,http,https --allow-username
 ```
 
-# What this lib check
+# What does this Lib?
 
-The library check complete URLs focusing on the protocol and domain structure. This library does NOT checks for path traversal attacks. The checks are made in the following order:
+The library checks for complete URLs focusing on the protocol and domain structure and tells whether is a possible SSRF attack or not. This library does NOT checks for path traversal attacks. The checks are made in the following order:
 
 - must contain a hostname
 - must not contain login-urls (e.g: https://user:pass@domain.com) - optionated
