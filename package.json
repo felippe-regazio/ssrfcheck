@@ -1,7 +1,8 @@
 {
   "name": "ssrfcheck",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Check if a string contains a potential SSRF attack",
+  "main": "./src/index.js",
   "scripts": {
     "test": "node ./tests/index.js && node ./tests/import.mjs"
   },

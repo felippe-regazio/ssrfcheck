@@ -19,6 +19,17 @@ const result = isSSRFSafeURL(url); // false
 
 The function returns true for a safe URL, and false for an unsafe one.
 
+### CommonJS
+
+You can use this library as a CJS module as well
+
+```js
+const { isSSRFSafeURL } = require('ssrfcheck');
+
+const url = 'https://localhost:8080/whatever';
+const result = isSSRFSafeURL(url); // false
+```
+
 ### CLI
 
 ```
