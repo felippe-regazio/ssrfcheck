@@ -132,7 +132,7 @@ If you wann know more about coverage, check the tests directory of this project.
 
 ## Warning
 
-This lib will not check SSRF attacks via redirection, those attacks when a valid URL is used to bypass security and then this URL redirects to a malicious endpoint. In order to prevent this attacks you must disable the `follow symlinks` and `HTTP redirections` on your server. To know more about other layers agains SSRF: https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+This lib will NOT check SSRF attacks via redirection since it cant hook into any kind of Request. In order to prevent those kind of attacks you must disable the `follow symlinks` and `HTTP redirections` on your server. To know more about other protection layers against SSRF: https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
 
 # Contribution
 
