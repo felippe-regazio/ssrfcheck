@@ -1,6 +1,6 @@
 # SSRF Check
 
-Check if a given URI-String contains a possible SSRF (Server-Side Request Forgery) attack. Zero dependencies!
+Check if a given URI-String contains a possible SSRF (Server-Side Request Forgery) attack. Zero dependencies! 
 
 ## Installation
 
@@ -50,11 +50,9 @@ npx ssrfcheck https://localhost:8080/whatever
 
 The command above will output `Safe` for safe URLs and `Danger!` for the possibly vulnerable ones.
 
-## When to Use
+## When to use it
 
-If you have any user-input/config that receives an URL, you are vunerable to SSRF attacks and must validate your URL. This library must be used on the backend. You can know more about it here:
-
-https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Request%20Forgery/README.md
+If you have any user-input/config that receives an URL which you use to request, or any kind of dynamic data that compose a complete URL, you may be vunerable to SSRF attacks and must validate this URL. This library must be used on the backend. This library requires a valid *URL* to check, the *minimum* URL schema is: `protocol://ip|top-level-domain`. Exotic strings will be normalized and mounted as an https URL by default (You can change it on the param `autoPrependProtocol`). This means that, if you type `www.example.com` it will be normalized by default to `https://www.example.com`. If you want to test fragments or paths and not only entire URLs, you may be looking for a `path traversal` validator instead. Any exotic string that cannot be normalized to a valid domain are considered a threat and will cause this library to return a Danger alert, since it can be a "tricky" path combination trying to exploit your service.
 
 ## Options
 
@@ -72,6 +70,7 @@ Options must be an object with the following structure:
   noIP: boolean,
   allowUsername: boolean,
   allowedProtocols: string[],
+  autoPrependProtocol: string,
 }
 ```
 
@@ -83,6 +82,7 @@ You can pass incremental options, that means: if you dont pass a value for some 
 |noIP|Tells if the validator must automatically block any IP-URIs, e.g. https://164.456.34.44. By default IP URIs are allowed |but analysed to check if there is any SSRF risk|boolean|false|
 |allowUsername|Tells if the validator must allow URI's that contains login notation, e.g. https://test:pass@domain.com. Address |like this are blocked by default|boolean|false|
 |allowedProtocols| Protocols accepted by the validator|Array|[ 'http', 'https ]|
+|autoPrependProtocol|When passing a non schema-complete URL, tries to normalize using this protocol, e.g: `a.com` will be normalized to `https://a.com` by default. Pass `false` to turn off URL normalization, this will cause any non-schema-complete URL to return false|string or `false`|https|
 
 ### Example
 
@@ -109,6 +109,7 @@ You can pass any options using CLI notation
 |--no-ip|noIP|
 |--allow-username|allowUsername|
 |--allowed-protocols=|allowedProtocols|
+|--auto-prepend-protocol=|autoPrependProtocol|
 
 Example
 
@@ -128,6 +129,10 @@ The library checks for complete URLs focusing on the protocol and domain structu
 - checks for tricks: oct domain, decimal domains, special chars, etc
 
 If you wann know more about coverage, check the tests directory of this project. Test data lives in /tests/data folder.
+
+## Warning
+
+This lib will not check SSRF attacks via redirection, those attacks when a valid URL is used to bypass security and then this URL redirects to a malicious endpoint. In order to prevent this attacks you must disable the `follow symlinks` and `HTTP redirections` on your server. To know more about other layers agains SSRF: https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
 
 # Contribution
 

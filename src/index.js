@@ -1,7 +1,5 @@
-const { isIP } = require('net');
-const { normalizeStr } = require('./normalize-str');
+const { parseURL } = require('./parse-url');
 const { isPrivateIP } = require('./is-private-ip');
-const { trimBrackets } = require('./trim-brackets');
 const { isLoopbackAddr } = require('./is-loopback-addr');
 
 function isSSRFSafeURL(input, config) {
@@ -13,14 +11,22 @@ function isSSRFSafeURL(input, config) {
     quiet: true,
     noIP: false,
     allowUsername: false,
+    autoPrependProtocol: 'https',
     allowedProtocols: [ 'http', 'https' ],
   }, config);
 
   try {
-    const { hostname, username, protocol } = new URL(normalizeStr(input));
-    const ip = (address => ({ address, version: isIP(address) }))(trimBrackets(hostname));
+    const {
+      ip,
+      hostIsIp,
+      ipVersion,
+      hostname,
+      username,
+      protocol,
+      validSchema,
+    } = parseURL(input, options.autoPrependProtocol);
 
-    if (!hostname) {
+    if (!validSchema || !hostname) {
       return false;
     }
 
@@ -40,7 +46,7 @@ function isSSRFSafeURL(input, config) {
       return false;
     }
 
-    if (ip.version && (options.noIP || isLoopbackAddr(ip.address) || isPrivateIP(ip.address, ip.version))) {
+    if (hostIsIp && (options.noIP || isLoopbackAddr(ip) || isPrivateIP(ip, ipVersion))) {
       return false;
     }
 
