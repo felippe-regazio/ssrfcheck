@@ -79,8 +79,8 @@ You can pass incremental options, that means: if you dont pass a value for some 
 |Option|Description|Type|Default|
 |--|--|--|---|
 |quiet|When an error occurs the function will only return false and wont throw it|boolean|true|
-|noIP|Tells if the validator must automatically block any IP-URIs, e.g. https://164.456.34.44. By default IP URIs are allowed |but analysed to check if there is any SSRF risk|boolean|false|
-|allowUsername|Tells if the validator must allow URI's that contains login notation, e.g. https://test:pass@domain.com. Address |like this are blocked by default|boolean|false|
+|noIP|Tells if the validator must automatically block any IP-URIs, e.g. https://164.456.34.44. By default IP URIs are allowed but analysed to check if there is any SSRF risk|boolean|false|
+|allowUsername|Tells if the validator must allow URI's that contains login notation, e.g. https://test:pass@domain.com. Address like this are blocked by default|boolean|false|
 |allowedProtocols| Protocols accepted by the validator|Array|[ 'http', 'https ]|
 |autoPrependProtocol|When passing a non schema-complete URL, tries to normalize using this protocol, e.g: `a.com` will be normalized to `https://a.com` by default. Pass `false` to turn off URL normalization, this will cause any non-schema-complete URL to return false|string or `false`|https|
 
