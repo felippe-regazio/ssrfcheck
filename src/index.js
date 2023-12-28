@@ -24,7 +24,8 @@ function isSSRFSafeURL(input, config) {
       username,
       protocol,
       validSchema,
-    } = parseURL(input, options.autoPrependProtocol);
+      isValidAt,
+    } = parseURL(input, options.autoPrependProtocol, options.allowUsername);
 
     if (!validSchema || !hostname) {
       return false;
