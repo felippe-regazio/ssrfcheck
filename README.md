@@ -111,6 +111,7 @@ You can pass any options using CLI notation
 |--no-ip|noIP|
 |--allow-username|allowUsername|
 |--allowed-protocols=|allowedProtocols|
+|--allow-unsafe-chars=|allowUnsafeChars|
 |--auto-prepend-protocol=|autoPrependProtocol|
 
 Example

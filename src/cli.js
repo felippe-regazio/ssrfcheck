@@ -11,6 +11,7 @@ const { isSSRFSafeURL } = require('../src/index.js');
     noIP: args.includes('--no-ip'),
     quiet: args.includes('--quiet'),
     allowUsername: args.includes('--allow-username'),
+    allowUnsafeChars: args.includes('--allow-unsafe-chars'),
     allowedProtocols: args.find(item => item.startsWith('--allowed-protocols='))?.split('=')[1].split(',') || ['http', 'https'],
     autoPrependProtocol:  autoProtocol ? (autoProtocol === 'false' ? false : autoProtocol) : 'https', 
   };
