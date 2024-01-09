@@ -8,6 +8,8 @@ module.exports = [
   "http://localhost:80",
   "http://localhost:443",
   "http://localhost:22",
+  "http://localhoste\@localhost",
+  "http://localhoste\\@localhost",
   "http://localhoste\ @localhost",
   "http://localhoste\\ @localhost",
   "http://localhoste\\\ @localhost",

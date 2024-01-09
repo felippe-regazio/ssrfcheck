@@ -11,6 +11,7 @@ function isSSRFSafeURL(input, config) {
     quiet: true,
     noIP: false,
     allowUsername: false,
+    allowUnsafeChars: false,
     autoPrependProtocol: 'https',
     allowedProtocols: [ 'http', 'https' ],
   }, config);
@@ -24,9 +25,14 @@ function isSSRFSafeURL(input, config) {
       username,
       protocol,
       validSchema,
+      hasUnsafeChars,
     } = parseURL(input, options.autoPrependProtocol);
 
     if (!validSchema || !hostname) {
+      return false;
+    }
+
+    if (!options.allowUnsafeChars && hasUnsafeChars) {
       return false;
     }
 

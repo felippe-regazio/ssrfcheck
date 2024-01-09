@@ -29,6 +29,11 @@ function startsWithProtocol(input) {
   return !!(match && match.index === 0);
 }
 
+function urlHasUnsafeChars(input) {
+  // https://stackoverflow.com/questions/1547899/which-characters-make-a-url-invalid/1547940#1547940
+  return /\"|<|>|\\|\^|`|{|\||\}/.test(input || '');
+}
+
 function parseURL(input, autoPrependProtocol) {
   const RESULT_INVALID_URL = { validSchema: false };
 
@@ -37,10 +42,12 @@ function parseURL(input, autoPrependProtocol) {
     const ipcheck = trimBrackets(url.hostname);
     const ipVersion = isIP(ipcheck);
     const hostIsIp = !!ipVersion;
+    const hasUnsafeChars = urlHasUnsafeChars(input);
 
     return Object.assign(url, {
       ip: hostIsIp ? ipcheck : null,
       validSchema: true,
+      hasUnsafeChars,
       ipVersion,
       hostIsIp,
     });

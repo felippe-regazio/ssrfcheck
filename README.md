@@ -71,6 +71,7 @@ Options must be an object with the following structure:
   allowUsername: boolean,
   allowedProtocols: string[],
   autoPrependProtocol: string,
+  allowUnsafeChars: boolean,
 }
 ```
 
@@ -83,6 +84,7 @@ You can pass incremental options, that means: if you dont pass a value for some 
 |allowUsername|Tells if the validator must allow URI's that contains login notation, e.g. https://test:pass@domain.com. Address like this are blocked by default|boolean|false|
 |allowedProtocols| Protocols accepted by the validator|Array|[ 'http', 'https ]|
 |autoPrependProtocol|When passing a non schema-complete URL, tries to normalize using this protocol, e.g: `a.com` will be normalized to `https://a.com` by default. Pass `false` to turn off URL normalization, this will cause any non-schema-complete URL to return false|string or `false`|https|
+|allowUnsafeChars|By The RFC, the following chars are forbidden as WYSIWYG in a URL and must be encoded: **"<>\\^`{|}**. This lib prohibites them by default, mark this option as true to allow it|boolean|false|
 
 ### Example
 
