@@ -1,5 +1,12 @@
 const { isIP } = require('net');
-const { trimBrackets } = require('./trim-brackets');
+
+function trimBrackets(hostname) {
+  if (hostname.startsWith('[') && hostname.endsWith(']')) {
+    return hostname.substring(1, hostname.length -1);
+  }
+  
+  return hostname;
+}
 
 /**
   when try to create a URL from the arg we take advantage of runtime 
@@ -13,11 +20,8 @@ function normalizeURLStr(str) {
   };
 
   return str
-    .trim()                                 // removed start and end spaces
-    .normalize('NFKD')                      // removed accents and diacrictics, normalize fancy chars
-    .split(' ')                             // breaks it onto parts dividing by spaces to check trailing \
-    .map(item => item.replace(/\\+$/, ""))  // remove all trailing backslaches, e.g: x\ to x
-    .join(' ');                             // reassembling it
+    .trim() // removed start and end spaces
+    .normalize('NFKD'); // removed accents and diacrictics, normalize fancy chars
 }
 
 function startsWithProtocol(input) {
