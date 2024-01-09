@@ -29,38 +29,20 @@ function startsWithProtocol(input) {
   return !!(match && match.index === 0);
 }
 
-function isValidAt(url, protocol, allowUsername){
-  const withoutProtocol = url.replace(new RegExp(`^${protocol}//`), '');
-  const indexOfBackslash = withoutProtocol.indexOf("\\");
-  const indexOfAt = withoutProtocol.indexOf("@");
-  const indexOfSlash = withoutProtocol.indexOf("/");
-  if (indexOfBackslash !== indexOfSlash && indexOfSlash === -1) {
-    return false;
-  }
-  if (!allowUsername && indexOfAt > indexOfBackslash) {
-    return false;
-  }
-  return true
-  
-}
-
-function parseURL(input, autoPrependProtocol, allowUsername) {
+function parseURL(input, autoPrependProtocol) {
   const RESULT_INVALID_URL = { validSchema: false };
 
   try {
-    const normalize = normalizeURLStr(input)
-    const url = new URL(normalize);
+    const url = new URL(normalizeURLStr(input));
     const ipcheck = trimBrackets(url.hostname);
     const ipVersion = isIP(ipcheck);
     const hostIsIp = !!ipVersion;
-    const validAt = isValidAt(normalize, url.protocol, allowUsername);
 
     return Object.assign(url, {
       ip: hostIsIp ? ipcheck : null,
       validSchema: true,
       ipVersion,
       hostIsIp,
-      validAt,
     });
   } catch {
     if (!startsWithProtocol(input) && autoPrependProtocol) {
