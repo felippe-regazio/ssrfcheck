@@ -8,6 +8,10 @@ const { version } = require('../package.json');
   const url = args.filter(item => !item.startsWith('--'))[0];
   const autoProtocol = args.find(item => item.startsWith('--auto-prepend-protocol='))?.split('=')[1];
 
+  if (!args || !args.length) {
+    return false;
+  }
+
   if (args[0] === 'version') {
     return console.log(version);
   }

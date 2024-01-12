@@ -3,7 +3,7 @@ const { isPrivateIP } = require('./is-private-ip');
 const { isLoopbackAddr } = require('./is-loopback-addr');
 
 function isSSRFSafeURL(input, config) {
-  if (typeof input !== 'string') {
+  if (typeof input !== 'string' || !input) {
     return false;
   }
 
