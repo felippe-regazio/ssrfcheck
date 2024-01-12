@@ -1,6 +1,6 @@
 {
   "name": "ssrfcheck",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Check if a string contains a potential SSRF attack",
   "main": "./src/index.js",
   "repository": {
