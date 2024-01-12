@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 
 const { isSSRFSafeURL } = require('../src/index.js');
+const { version } = require('../package.json');
 
 (function() {
   const args = process.argv.slice(2);
   const url = args.filter(item => !item.startsWith('--'))[0];
   const autoProtocol = args.find(item => item.startsWith('--auto-prepend-protocol='))?.split('=')[1];
+
+  if (args[0] === 'version') {
+    return console.log(version);
+  }
 
   const config = {
     noIP: args.includes('--no-ip'),
