@@ -2,6 +2,14 @@
 
 Check if a given URI-String contains a possible SSRF (Server-Side Request Forgery) attack. Zero dependencies! 
 
+## Security State
+
+The current stable version of this package do not have opened or known vulnerabilities.
+Always remember to keep this package updated in the @latest version.
+You can check the vulnerabilities history here:
+
+https://security.snyk.io/vuln/SNYK-JS-SSRFCHECK-9510756
+
 ## Installation
 
 ```
