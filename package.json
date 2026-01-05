@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "Check if a string contains a potential SSRF attack",
   "main": "./src/index.js",
+  "types": "./index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/felippe-regazio/ssrfcheck"
