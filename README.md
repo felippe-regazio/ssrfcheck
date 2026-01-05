@@ -130,7 +130,7 @@ npx ssrfcheck ftp://user:pass@localhost:8080/whatever --allowed-protocols=ftp,ht
 
 # What does this Lib check?
 
-The library checks for complete URLs focusing on the protocol and domain structure and tells whether is a possible SSRF attack or not. This library does NOT checks for path traversal attacks. The checks are made in the following order:
+This is a static checker that verifies a string representation of a network URI, not a network checker per-se. Is your concern to provide a reliable URI for the checker. The library checks for complete URLs focusing on the protocol and domain structure and tells whether is a possible SSRF attack or not. This library does NOT check path traversal attacks. The checks are made in the following order:
 
 - must contain a hostname
 - must not contain login-urls (e.g: https://user:pass@domain.com) (optionated)
