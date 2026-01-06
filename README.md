@@ -1,6 +1,24 @@
 # SSRF Check
 
-Check if a given URI-String contains a possible SSRF (Server-Side Request Forgery) attack. Zero dependencies! 
+Check if a given `URI String Representation` contains a potential SSRF (Server-Side Request Forgery) attack. Zero dependencies!
+
+# What does this Lib check?
+
+This library checks for complete URLs strings focusing on the protocol and domain structure, then tells whether is a possible SSRF attack or not. The checks are made in the following order:
+
+- must contain a hostname
+- must not contain login-urls (e.g: https://user:pass@domain.com) (optionated)
+- cannot contain RFC forbidden chars: "<>\\^\`\{\|\} (optionated)
+- cannot be a dot domain (e.g: https://./../.com) - commonly result of some trick
+- cannot be localhost or loopback domain
+- cannot be a private IP of any range
+- checks for tricks: oct domain, decimal domains, special chars, etc
+
+If you wann know more about coverage, check the tests directory of this project. Test data lives in /tests/data folder.
+
+## What the lib DOES NOT check?
+
+This library does NOT check path traversal attacks. This library does not check the network or DNS layer to assert the URI, is your responsability to check and provide a reliable URI origin for the checker. This lib will NOT check SSRF attacks via redirection since it cant hook into any kind of Request. To know more about other protection layers against SSRF: https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
 
 ## Security State
 
@@ -127,24 +145,6 @@ Example
 ```
 npx ssrfcheck ftp://user:pass@localhost:8080/whatever --allowed-protocols=ftp,http,https --allow-username
 ```
-
-# What does this Lib check?
-
-This is a static checker that verifies a string representation of a network URI, not a network checker per-se. Is your concern to provide a reliable URI for the checker. The library checks for complete URLs focusing on the protocol and domain structure and tells whether is a possible SSRF attack or not. This library does NOT check path traversal attacks. The checks are made in the following order:
-
-- must contain a hostname
-- must not contain login-urls (e.g: https://user:pass@domain.com) (optionated)
-- cannot contain RFC forbidden chars: "<>\\^\`\{\|\} (optionated)
-- cannot be a dot domain (e.g: https://./../.com) - commonly result of some trick
-- cannot be localhost or loopback domain
-- cannot be a private IP of any range
-- checks for tricks: oct domain, decimal domains, special chars, etc
-
-If you wann know more about coverage, check the tests directory of this project. Test data lives in /tests/data folder.
-
-## Warning
-
-This lib will NOT check SSRF attacks via redirection since it cant hook into any kind of Request. In order to prevent those kind of attacks you must disable the `follow symlinks` and `HTTP redirections` on your server. To know more about other protection layers against SSRF: https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
 
 # Contribution
 
