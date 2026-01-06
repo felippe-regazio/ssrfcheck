@@ -18,7 +18,7 @@ If you wann know more about coverage, check the tests directory of this project.
 
 ## What the lib DOES NOT check?
 
-This library does NOT check path traversal attacks. This library does not check the network or DNS layer to assert the URI, is your responsability to check and provide a reliable URI origin for the checker. This lib will NOT check SSRF attacks via redirection since it cant hook into any kind of Request. To know more about other protection layers against SSRF: https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
+This library does NOT check path traversal attacks. This library does not garantee the DNS layer sucurity, despite trying our best to validate the origin. This library will NOT check SSRF attacks via redirection since it cant hook into any kind of Request. To know more about other protection layers against SSRF: https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/
 
 ## Security State
 
