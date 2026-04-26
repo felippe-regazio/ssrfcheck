@@ -63,33 +63,39 @@ function privIp4(ip) {
   return false;
 }
 
-function ipv4FromMappedIPv6(ip) {
+function ipv4FromEmbeddedIPv6(ip) {
   const normalized = ip.toLowerCase();
-  const match = normalized.match(/^::f{4}:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
 
-  if (!match) {
-    return null;
+  const patterns = [
+    /^::f{4}:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
+    /^::f{4}:0:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
+    /^64:ff9b::([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = normalized.match(pattern);
+
+    if (!match) {
+      continue;
+    }
+
+    const high = parseInt(match[1], 16);
+    const low = parseInt(match[2], 16);
+
+    return [
+      high >> 8,
+      high & 255,
+      low >> 8,
+      low & 255,
+    ].join('.');
   }
 
-  const high = parseInt(match[1], 16);
-  const low = parseInt(match[2], 16);
-
-  return [
-    high >> 8,
-    high & 255,
-    low >> 8,
-    low & 255
-  ].join('.');
+  return null;
 }
 
 function privIp6 (ip) {
-  const mappedIPv4 = ipv4FromMappedIPv6(ip);
-
-  if (mappedIPv4) {
-    return privIp4(mappedIPv4);
-  }
-
-  return /^::$/.test(ip) ||
+  return ipv4FromEmbeddedIPv6(ip) && privIp4(ipv4FromEmbeddedIPv6(ip)) ||
+    /^::$/.test(ip) ||
     /^::1$/.test(ip) ||
     /^::f{4}:([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip) ||
     /^::f{4}:0.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip) ||
