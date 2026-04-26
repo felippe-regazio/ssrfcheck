@@ -1,4 +1,4 @@
-const { BlockList } = require('net');
+const { BlockList, isIP } = require('net');
 
 /*
   Iana reserved IP list:
@@ -33,6 +33,25 @@ const PRIVATE_CIDRS = [
   '255.255.255.255/32'
 ];
 
+const DIRECT_PRIVATE_IPV6_BLOCKLIST = new BlockList();
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addAddress('::', 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addAddress('::1', 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('fc00::', 7, 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('fe80::', 10, 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('ff00::', 8, 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('100::', 64, 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('2001::', 32, 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('2001:20::', 28, 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('2001:db8::', 32, 'ipv6');
+DIRECT_PRIVATE_IPV6_BLOCKLIST.addSubnet('2002::', 16, 'ipv6');
+
+const IPV4_BEARING_IPV6_BLOCKLIST = new BlockList();
+IPV4_BEARING_IPV6_BLOCKLIST.addSubnet('::ffff:0:0', 96, 'ipv6');
+IPV4_BEARING_IPV6_BLOCKLIST.addSubnet('::ffff:0:0:0', 96, 'ipv6');
+IPV4_BEARING_IPV6_BLOCKLIST.addSubnet('64:ff9b::', 96, 'ipv6');
+IPV4_BEARING_IPV6_BLOCKLIST.addSubnet('64:ff9b:1::', 48, 'ipv6');
+IPV4_BEARING_IPV6_BLOCKLIST.addSubnet('::', 96, 'ipv6');
+
 function rangeCIDR(CIDR) {
 	// beginning IP address
 	var beg = CIDR.substr(CIDR,CIDR.indexOf('/'));
@@ -63,65 +82,112 @@ function privIp4(ip) {
   return false;
 }
 
-function ipv4FromEmbeddedIPv6(ip) {
-  const normalized = ip.toLowerCase();
+function dottedIPv4ToHextets(ipv4) {
+  const octets = ipv4.split('.').map(Number);
 
-  const dottedPatterns = [
-    /^::f{4}:(\d{1,3}(?:\.\d{1,3}){3})$/,
-    /^::f{4}:0:(\d{1,3}(?:\.\d{1,3}){3})$/,
-    /^64:ff9b::(\d{1,3}(?:\.\d{1,3}){3})$/,
-  ];
-
-  for (const pattern of dottedPatterns) {
-    const match = normalized.match(pattern);
-
-    if (match) {
-      return match[1];
-    }
+  if (octets.length !== 4 || octets.some((item) => item < 0 || item > 255 || Number.isNaN(item))) {
+    return null;
   }
 
-  const hexPatterns = [
-    /^::f{4}:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
-    /^::f{4}:0:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
-    /^64:ff9b::([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
-  ];
+  const high = ((octets[0] << 8) | octets[1]).toString(16);
+  const low = ((octets[2] << 8) | octets[3]).toString(16);
 
-  for (const pattern of hexPatterns) {
-    const match = normalized.match(pattern);
+  return `${high}:${low}`;
+}
 
-    if (!match) {
-      continue;
-    }
+function normalizeIPv6ForBlockList(ip) {
+  const normalized = String(ip || '').toLowerCase();
+  const dottedTail = normalized.match(/^(.*:)(\d{1,3}(?:\.\d{1,3}){3})$/);
 
-    const high = parseInt(match[1], 16);
-    const low = parseInt(match[2], 16);
-
-    return [
-      high >> 8,
-      high & 255,
-      low >> 8,
-      low & 255,
-    ].join('.');
+  if (!dottedTail) {
+    return normalized;
   }
 
-  return null;
+  const hextets = dottedIPv4ToHextets(dottedTail[2]);
+
+  if (!hextets) {
+    return normalized;
+  }
+
+  return `${dottedTail[1]}${hextets}`;
+}
+
+function expandIPv6ToHextets(ip) {
+  const value = normalizeIPv6ForBlockList(ip).toLowerCase();
+
+  if (isIP(value) !== 6) {
+    return null;
+  }
+
+  if ((value.match(/::/g) || []).length > 1) {
+    return null;
+  }
+
+  let left = [];
+  let right = [];
+
+  if (value.includes('::')) {
+    const parts = value.split('::');
+    left = parts[0] ? parts[0].split(':').filter(Boolean) : [];
+    right = parts[1] ? parts[1].split(':').filter(Boolean) : [];
+  } else {
+    left = value.split(':').filter(Boolean);
+  }
+
+  const validHex = /^[0-9a-f]{1,4}$/;
+  if (![...left, ...right].every((item) => validHex.test(item))) {
+    return null;
+  }
+
+  const missing = 8 - (left.length + right.length);
+  if (missing < 0 || (!value.includes('::') && missing !== 0)) {
+    return null;
+  }
+
+  const full = value.includes('::')
+    ? [...left, ...Array(missing).fill('0'), ...right]
+    : left;
+
+  if (full.length !== 8) {
+    return null;
+  }
+
+  return full.map((item) => parseInt(item, 16));
+}
+
+function ipv4FromIPv4BearingIPv6(ip) {
+  const normalized = normalizeIPv6ForBlockList(ip);
+
+  if (!IPV4_BEARING_IPV6_BLOCKLIST.check(normalized, 'ipv6')) {
+    return null;
+  }
+
+  const hextets = expandIPv6ToHextets(normalized);
+
+  if (!hextets) {
+    return null;
+  }
+
+  return [
+    hextets[6] >> 8,
+    hextets[6] & 255,
+    hextets[7] >> 8,
+    hextets[7] & 255,
+  ].join('.');
 }
 
 function privIp6 (ip) {
-  const embeddedIPv4 = ipv4FromEmbeddedIPv6(ip);
+  const normalized = normalizeIPv6ForBlockList(ip);
+
+  if (isIP(normalized) !== 6) {
+    return false;
+  }
+
+  const embeddedIPv4 = ipv4FromIPv4BearingIPv6(normalized);
 
   return Boolean(
     (embeddedIPv4 && privIp4(embeddedIPv4)) ||
-    /^::$/.test(ip) ||
-    /^::1$/.test(ip) ||
-    /^100::([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
-    /^2001::([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
-    /^2001:2[0-9a-fA-F]:([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
-    /^2001:db8:([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
-    /^2002:([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
-    /^f[c-d]([0-9a-fA-F]{2,2}):/i.test(ip) ||
-    /^fe[8-9a-bA-B][0-9a-fA-F]:/i.test(ip) ||
-    /^ff([0-9a-fA-F]{2,2}):/i.test(ip)
+    DIRECT_PRIVATE_IPV6_BLOCKLIST.check(normalized, 'ipv6')
   );
 }
 
