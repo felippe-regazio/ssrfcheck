@@ -63,7 +63,32 @@ function privIp4(ip) {
   return false;
 }
 
+function ipv4FromMappedIPv6(ip) {
+  const normalized = ip.toLowerCase();
+  const match = normalized.match(/^::f{4}:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const high = parseInt(match[1], 16);
+  const low = parseInt(match[2], 16);
+
+  return [
+    high >> 8,
+    high & 255,
+    low >> 8,
+    low & 255
+  ].join('.');
+}
+
 function privIp6 (ip) {
+  const mappedIPv4 = ipv4FromMappedIPv6(ip);
+
+  if (mappedIPv4) {
+    return privIp4(mappedIPv4);
+  }
+
   return /^::$/.test(ip) ||
     /^::1$/.test(ip) ||
     /^::f{4}:([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip) ||

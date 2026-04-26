@@ -26,6 +26,8 @@ module.exports = [
   "https://1337.net",
   "http://a.b-c.de",
   "http://223.255.255.254",
+  "http://[::ffff:8.8.8.8]/",
+  "http://[::ffff:808:808]/",
   "http://ⓔⓧⓐⓜⓟⓛⓔ.ⓒⓞⓜ",
   "foo.com/blah_blah",
   "foo.com/blah_blah/",
