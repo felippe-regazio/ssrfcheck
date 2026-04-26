@@ -66,13 +66,27 @@ function privIp4(ip) {
 function ipv4FromEmbeddedIPv6(ip) {
   const normalized = ip.toLowerCase();
 
-  const patterns = [
+  const dottedPatterns = [
+    /^::f{4}:(\d{1,3}(?:\.\d{1,3}){3})$/,
+    /^::f{4}:0:(\d{1,3}(?:\.\d{1,3}){3})$/,
+    /^64:ff9b::(\d{1,3}(?:\.\d{1,3}){3})$/,
+  ];
+
+  for (const pattern of dottedPatterns) {
+    const match = normalized.match(pattern);
+
+    if (match) {
+      return match[1];
+    }
+  }
+
+  const hexPatterns = [
     /^::f{4}:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
     /^::f{4}:0:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
     /^64:ff9b::([0-9a-f]{1,4}):([0-9a-f]{1,4})$/,
   ];
 
-  for (const pattern of patterns) {
+  for (const pattern of hexPatterns) {
     const match = normalized.match(pattern);
 
     if (!match) {
@@ -94,12 +108,12 @@ function ipv4FromEmbeddedIPv6(ip) {
 }
 
 function privIp6 (ip) {
-  return ipv4FromEmbeddedIPv6(ip) && privIp4(ipv4FromEmbeddedIPv6(ip)) ||
+  const embeddedIPv4 = ipv4FromEmbeddedIPv6(ip);
+
+  return Boolean(
+    (embeddedIPv4 && privIp4(embeddedIPv4)) ||
     /^::$/.test(ip) ||
     /^::1$/.test(ip) ||
-    /^::f{4}:([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip) ||
-    /^::f{4}:0.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip) ||
-    /^64:ff9b::([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/.test(ip) ||
     /^100::([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
     /^2001::([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
     /^2001:2[0-9a-fA-F]:([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4}):?([0-9a-fA-F]{0,4})$/.test(ip) ||
@@ -108,6 +122,7 @@ function privIp6 (ip) {
     /^f[c-d]([0-9a-fA-F]{2,2}):/i.test(ip) ||
     /^fe[8-9a-bA-B][0-9a-fA-F]:/i.test(ip) ||
     /^ff([0-9a-fA-F]{2,2}):/i.test(ip)
+  );
 }
 
 function isPrivateIP(ip, version) {
