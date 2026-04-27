@@ -1,11 +1,14 @@
 const path = require('path');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const { isSSRFSafeURL } = require('../src/index.js');
 const shouldPassData = require('./data/should-pass.js');
 const shouldNotPassData = require('./data/should-not-pass.js');
 const validIPsListData = require('./data/valid-ips-list');
 const BIN_CLI_PATH = path.resolve(__dirname, '..', 'src', 'cli.js');
-const cliexec = (url, opts = '--quiet') => execSync(`${BIN_CLI_PATH} \"${url}\" ${opts}`).toString().trim();
+const cliexec = (url, opts = '--quiet') => {
+  const args = [BIN_CLI_PATH, url, ...opts.split(' ').filter(Boolean)];
+  return execFileSync(process.execPath, args).toString().trim();
+};
 const inform = (url, result) => console.log(`Checked: ${url} → ${result}`);
 
 // =================================================================
